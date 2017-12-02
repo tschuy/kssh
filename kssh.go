@@ -30,15 +30,24 @@ func getNodes() []string {
 func main() {
 	var bastion = flag.String("bastion", "", "hostname of the bastion server")
 	var listNodes = flag.Bool("nodes", false, "just list nodes, don't render config")
+	var cssh = flag.String("cssh", "", "output a ClusterSSH configuration line")
 	flag.Parse()
-	if !*listNodes && *bastion == "" {
+	// show usage and exit if necessary
+	if !*listNodes && *bastion == "" && *cssh == "" {
 		fmt.Print(helpText)
 		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
+
 	nodes := getNodes()
-	if *listNodes {
+	if *cssh != "" {
+		// output a cssh config line
+		fmt.Printf("%s ", *cssh)
+		for _, n := range nodes {
+			fmt.Printf("%s ", n)
+		}
+	} else if *listNodes {
 		// a convoluted way to get the output of the source kubectl command
 		for _, n := range nodes {
 			fmt.Printf("%s\n", n)
